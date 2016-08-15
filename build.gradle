@@ -90,7 +90,7 @@ def releseChecks(){
 }
 
 def commitVersionFileChanges(){
-	getVersionFile.write(new JsonBuilder(versionJSON).toPrettyString())
+	getVersionFile().write(new JsonBuilder(versionJSON).toPrettyString())
 	
 	// Add changes
 	def changes = grgit.status().unstaged.getAllChanges()
