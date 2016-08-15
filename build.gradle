@@ -78,9 +78,12 @@ assets {
 
 def versionFile = file("./version.json")
 def versionJSON = new JsonSlurper().parseText(versionFile.text)
-
+//def grgit = org.ajoberstar.grgit.Grgit.open(dir: project.rootDir.absolutePath)
 
 def releseChecks(){
+	grgit.remote.list().each {
+		println(it.name)
+	}
 	// Ensure our working copy is clean first
 	if (!grgit.status().isClean()) {
 		throw new GradleException("You must NOT have any changes in your working copy!")
