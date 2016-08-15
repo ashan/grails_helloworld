@@ -106,7 +106,7 @@ def commitVersionFileChanges(versionFile, versionJSON){
 
 def tagRelease(versionJSON){
 	// Tag
-	def tagName = "${versionJSON.major}.${versionJSON.minor}.${versionJSON.revision} - ${versionJSON.buildNumber}"
+	def tagName = "${versionJSON.major}.${versionJSON.minor}.${versionJSON.revision}.${versionJSON.buildNumber}"
 	grgit.tag.add(name: tagName, message: "Release: ${tagName}")
 
 	// Push
