@@ -10,13 +10,10 @@ buildscript {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.8.2"
         classpath "org.grails.plugins:hibernate4:5.0.10"
-        classpath "ch.netzwerg:gradle-release-plugin:1.2.4"
     }
 }
 
-plugins{
-    id "ch.netzwerg.release" version "1.2.4"
-}
+
 
 //version "0.1"
 group "helloworld"
