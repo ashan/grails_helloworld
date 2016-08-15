@@ -78,7 +78,6 @@ assets {
 
 def versionFile = file("./version.json")
 def versionJSON = new JsonSlurper().parseText(versionFile.text)
-//def grgit = org.ajoberstar.grgit.Grgit.open(dir: project.rootDir.absolutePath)
 
 def releseChecks(){
 	grgit.remote.list().each {
@@ -98,7 +97,7 @@ def commitVersionFileChanges(versionFile, versionJSON){
 	grgit.add(update: true, patterns: changes)
 
 	// Commit
-	grgit.commit(message: "Prepare for Alpha release")
+	grgit.commit(message: "Prepare for release")
 
 	// Push
 	grgit.push()
@@ -108,7 +107,7 @@ def commitVersionFileChanges(versionFile, versionJSON){
 def tagRelease(versionJSON){
 	// Tag
 	def tagName = "${versionJSON.major}.${versionJSON.minor}.${versionJSON.revision} - ${versionJSON.buildNumber}"
-	grgit.tag.add(name: tagName, message: "Release: ${tagName}")
+	grgit.tag.add(name: 'test', message: "Release: ")
 
 	// Push
 	grgit.push(refsOrSpecs: [tagName])
