@@ -86,7 +86,7 @@ def releseChecks(){
 	}
 }
 
-def commitVersionFileChanges(versionFile){
+def commitVersionFileChanges(versionFile, versionJSON){
 	versionFile.write(new JsonBuilder(versionJSON).toPrettyString())
 	
 	// Add changes
@@ -101,7 +101,7 @@ def commitVersionFileChanges(versionFile){
 
 }
 
-def tagBuild(versionJSON){
+def tagRelease(versionJSON){
 	// Tag
 	def tagName = "${versionJSON.major}.${versionJSON.minor}.${versionJSON.revision} - ${versionJSON.buildNumber}"
 	grgit.tag.add(name: tagName, message: "Release: ${tagName}")
@@ -116,8 +116,8 @@ task releaseMajor <<{
 	versionJSON.minor = 0
 	versionJSON.revision = 0
 	versionJSON.buildNumber = 0
-	commitVersionFileChanges(versionFile)
-	tagBuild(versionJSON)
+	commitVersionFileChanges(versionFile, versionJSON)
+	tagRelease(versionJSON)
 }
 
 task releaseMinor << {
@@ -125,21 +125,21 @@ task releaseMinor << {
 	versionJSON.minor++
 	versionJSON.revision = 0
 	versionJSON.buildNumber = 0
-	commitVersionFileChanges(versionFile)
-	tagBuild(versionJSON)
+	commitVersionFileChanges(versionFile, versionJSON)
+	tagRelease(versionJSON)
 }
 
 task releaseRevision << {
 	releseChecks()
 	versionJSON.revision++
 	versionJSON.buildNumber = 0
-	commitVersionFileChanges(versionFile)
-	tagBuild(versionJSON)
+	commitVersionFileChanges(versionFile, versionJSON)
+	tagRelease(versionJSON)
 }
 
 task releaseBuild <<{
 	releseChecks()
 	versionJSON.buildNumber++
-	commitVersionFileChanges(versionFile)
-	tagBuild(versionJSON)
+	commitVersionFileChanges(versionFile, versionJSON)
+	tagRelease(versionJSON)
 }
