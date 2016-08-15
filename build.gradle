@@ -78,6 +78,8 @@ assets {
 
 def versionFile = file("./version.json")
 def versionJSON = new JsonSlurper().parseText(versionFile.text)
+org.ajoberstar.grgit.auth.username=ashan
+org.ajoberstar.grgit.auth.password=kastha01
 
 def releseChecks(){
 	// Ensure our working copy is clean first
