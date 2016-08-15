@@ -1,3 +1,5 @@
+import groovy.json.*
+
 buildscript {
     ext {
         grailsVersion = project.grailsVersion
@@ -13,6 +15,11 @@ buildscript {
     }
 }
 
+// GRGit for releases
+plugins {
+	id 'org.ajoberstar.grgit' version '1.5.1'
+}
+apply plugin: 'org.ajoberstar.grgit'
 
 
 //version "0.1"
@@ -67,4 +74,71 @@ dependencies {
 assets {
     minifyJs = true
     minifyCss = true
+}
+
+def versionFile = file("./version.json")
+def versionJSON = new JsonSlurper().parseText(versionFile.text)
+
+def releseChecks(){
+	// Ensure our working copy is clean first
+	if (!grgit.status().isClean()) {
+		throw new GradleException("You must NOT have any changes in your working copy!")
+	}
+}
+
+def commitVersionFileChanges(){
+	versionFile.write(new JsonBuilder(versionJSON).toPrettyString())
+	
+	// Add changes
+	def changes = grgit.status().unstaged.getAllChanges()
+	grgit.add(update: true, patterns: changes)
+
+	// Commit
+	grgit.commit(message: "Prepare for Alpha release")
+
+	// Push
+	grgit.push()
+
+}
+
+def tagBuild(){
+	// Tag
+	def tagName = "${major}.${minor}.${revision} - ${buildNumber}"
+	grgit.tag.add(name: tagName, message: "Alpha Release ${tagName}")
+
+	// Push
+	grgit.push(refsOrSpecs: [tagName])
+}
+
+task releaseMajor <<{
+	releseChecks()
+	versionJSON.major++
+	versionJSON.minor = 0
+	versionJSON.revision = 0
+	versionJSON.buildNumber = 0
+	commitVersionFileChanges()
+	tagBuild()
+}
+
+task releaseMinor << {
+	releseChecks()
+	versionJSON.minor++
+	versionJSON.revision = 0
+	versionJSON.buildNumber = 0
+	commitVersionFileChanges()
+	tagBuild()
+}
+
+task releaseRevision << {
+	releseChecks()
+	versionJSON.revision++
+	versionJSON.buildNumber = 0
+	commitVersionFileChanges()
+	tagBuild()
+}
+
+task releaseBuild <<{
+	releseChecks()
+	versionJSON.buildNumber++
+	commitVersionFileChanges()
 }
