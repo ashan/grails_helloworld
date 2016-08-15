@@ -76,8 +76,11 @@ assets {
     minifyCss = true
 }
 
-def versionFile = file("./version.json")
-def versionJSON = new JsonSlurper().parseText(versionFile.text)
+//def versionFile = file("./version.json")
+def versionJSON = new JsonSlurper().parseText(getVersionFile().text)
+def File getVersionFile(){
+	file("./version.json")
+}
 
 def releseChecks(){
 	// Ensure our working copy is clean first
@@ -87,7 +90,7 @@ def releseChecks(){
 }
 
 def commitVersionFileChanges(){
-	versionFile.write(new JsonBuilder(versionJSON).toPrettyString())
+	getVersionFile.write(new JsonBuilder(versionJSON).toPrettyString())
 	
 	// Add changes
 	def changes = grgit.status().unstaged.getAllChanges()
