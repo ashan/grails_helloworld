@@ -76,11 +76,8 @@ assets {
     minifyCss = true
 }
 
-//def versionFile = file("./version.json")
-def versionJSON = new JsonSlurper().parseText(getVersionFile().text)
-def File getVersionFile(){
-	file("./version.json")
-}
+def versionFile = file("./version.json")
+def versionJSON = new JsonSlurper().parseText(versionFile.text)
 
 def releseChecks(){
 	// Ensure our working copy is clean first
@@ -89,8 +86,8 @@ def releseChecks(){
 	}
 }
 
-def commitVersionFileChanges(){
-	getVersionFile().write(new JsonBuilder(versionJSON).toPrettyString())
+def commitVersionFileChanges(versionFile){
+	versionFile.write(new JsonBuilder(versionJSON).toPrettyString())
 	
 	// Add changes
 	def changes = grgit.status().unstaged.getAllChanges()
@@ -104,10 +101,10 @@ def commitVersionFileChanges(){
 
 }
 
-def tagBuild(){
+def tagBuild(versionJSON){
 	// Tag
-	def tagName = "${major}.${minor}.${revision} - ${buildNumber}"
-	grgit.tag.add(name: tagName, message: "Alpha Release ${tagName}")
+	def tagName = "${versionJSON.major}.${versionJSON.minor}.${versionJSON.revision} - ${versionJSON.buildNumber}"
+	grgit.tag.add(name: tagName, message: "Release: ${tagName}")
 
 	// Push
 	grgit.push(refsOrSpecs: [tagName])
@@ -119,8 +116,8 @@ task releaseMajor <<{
 	versionJSON.minor = 0
 	versionJSON.revision = 0
 	versionJSON.buildNumber = 0
-	commitVersionFileChanges()
-	tagBuild()
+	commitVersionFileChanges(versionFile)
+	tagBuild(versionJSON)
 }
 
 task releaseMinor << {
@@ -128,20 +125,21 @@ task releaseMinor << {
 	versionJSON.minor++
 	versionJSON.revision = 0
 	versionJSON.buildNumber = 0
-	commitVersionFileChanges()
-	tagBuild()
+	commitVersionFileChanges(versionFile)
+	tagBuild(versionJSON)
 }
 
 task releaseRevision << {
 	releseChecks()
 	versionJSON.revision++
 	versionJSON.buildNumber = 0
-	commitVersionFileChanges()
-	tagBuild()
+	commitVersionFileChanges(versionFile)
+	tagBuild(versionJSON)
 }
 
 task releaseBuild <<{
 	releseChecks()
 	versionJSON.buildNumber++
-	commitVersionFileChanges()
+	commitVersionFileChanges(versionFile)
+	tagBuild(versionJSON)
 }
